@@ -6,46 +6,36 @@ import (
 	"text/template"
 )
 
-type RpcMethod struct {
-	Name       string `json:"name"`
-	Request    string `json:"request"`
-	Response   string `json:"response"`
-	HTTPMethod string `json:"httpMethod"`
-	URL        string `json:"url"`
-}
-
-const rpcTemplate = `
-func (h *GrpcHandler) {{.Name}}(ctx context.Context, in *pb.{{.Request}}) (*pb.{{.Response}}, error) {
-  
-	c_list, err := h.CaseSvc.{{.Name}}(ctx, in.DomainID, in.MemberPath, in.NoCustomer)
-    if err != nil {
-        return nil, err
-    }
-
-    return nil, nil
-}
-`
-
-func main() {
-	content, err := os.ReadFile("example.proto")
+func proto2Func(protoFilePath, outFilePath string) []RpcMethod {
+	content, err := os.ReadFile(protoFilePath)
 	if err != nil {
 		panic(err)
 	}
 
 	str := string(content)
-
-	re := regexp.MustCompile(`rpc (\w+)\((\w+)\) returns \((\w+|\w+ \w+)\) {\s+option \(google.api.http\) = {\s+(\w+):"([^"]+)",`)
+	re := regexp.MustCompile(must)
 	matches := re.FindAllStringSubmatch(str, -1)
 
 	methods := make([]RpcMethod, 0)
 	for _, match := range matches {
-		if len(match) > 5 {
+		log.Debug().Interface("sss", match).Msg("ss")
+		if len(match) >= 3 {
+			if match[2] == "google.protobuf.StringValue" {
+				match[2] = "wrapperspb.StringValue"
+			}
+			if match[3] == "google.protobuf.StringValue" {
+				match[3] = "wrapperspb.StringValue"
+			}
+			if match[2] == "google.protobuf.Empty" {
+				match[2] = "emptypb.Empty"
+			}
+			if match[3] == "google.protobuf.Empty" {
+				match[3] = "emptypb.Empty"
+			}
 			methods = append(methods, RpcMethod{
-				Name:       match[1],
-				Request:    match[2],
-				Response:   match[3],
-				HTTPMethod: match[4],
-				URL:        match[5],
+				Name:     match[1],
+				Request:  match[2],
+				Response: match[3],
 			})
 		}
 	}
@@ -55,8 +45,7 @@ func main() {
 		panic(err)
 	}
 
-	filePath := "./handler.go"
-	file, err := os.Create(filePath)
+	file, err := os.Create(outFilePath)
 	if err != nil {
 		panic(err)
 	}
@@ -68,4 +57,26 @@ func main() {
 			panic(err)
 		}
 	}
+	return methods
 }
+
+type RpcMethod struct {
+	Name     string `json:"name"`
+	Request  string `json:"request"`
+	Response string `json:"response"`
+}
+
+const must = `rpc (\w+)\(([\w\.]+)\) returns \(([\w\.]+)\) \{\};`
+
+const rpcTemplate = `
+func (h *GrpcHandler) {{.Name}}(ctx context.Context, in *pb.{{.Request}}) (*pb.{{.Response}}, error) {
+  
+	c_list, err := h.Svc.{{.Name}}(ctx)
+    if err != nil {
+        return nil, err
+    }
+
+    return nil, nil
+}
+`
+

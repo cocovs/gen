@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package library;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+option go_package = "./proto;library";
+
+service  HelloWord {
+    rpc Hello(HelloRequest) returns (HelloResponse) {
+        option (google.api.http) = {
+           post:"/hello",
+           body:"*"
+       };
+    };
+}
+
+
+service Library {
+    //ListBooks
+    rpc ListBooks(ListBooksRequest) returns (ListBooksResponse) {
+        option (google.api.http) = {
+            get:"/library/books"
+        };
+    };
+    //GetBook
+    rpc GetBook(google.protobuf.StringValue) returns (Book) {
+        option (google.api.http) = {
+            get:"/library/book/{value}"
+        };
+    };
+    //CreateBook
+    rpc CreateBook(CreateBookRequest) returns (Book) {
+        option (google.api.http) = {
+            post:"/library/book",
+            body:"*"
+        };
+    };
+    //UpdateBook
+    rpc UpdateBook(UpdateBookRequest) returns (Book) {
+    };
+    //DeleteBook
+    rpc DeleteBook(google.protobuf.StringValue) returns (google.protobuf.Empty) {};
+}
+
+
+
+message HelloRequest {
+}
+
+message HelloResponse {
+    string message = 1;
+}
+
+message ListBooksRequest {
+}
+message ListBooksResponse {
+    repeated Book books = 1;
+}
+message CreateBookRequest {
+    string name = 1;
+    string author = 2;
+    string isbn = 3;
+}
+message UpdateBookRequest {
+    string id = 1;
+    string name = 2;
+    string author = 3;
+    string isbn = 4;
+}
+message Book {
+    string id = 1;
+    string name = 2;
+    string author = 3;
+    string isbn = 4;
+}
+message DeleteBookRequest {
+    string id = 1;
+}
+message DeleteBookResponse {
+}
+message GetBookRequest {
+    string id = 1;
+}
+message GetBookResponse {
+    Book book = 1;
+}

@@ -1,3 +1,18 @@
-module github.com/cocovs/proto2handler
+module github.com/cocovs/gen
 
-go 1.22.1
+go 1.22.2
+
+require (
+	github.com/Xuanwo/gg v0.3.0
+	github.com/rs/zerolog v1.32.0
+	github.com/spf13/cobra v1.8.0
+)
+
+require (
+	github.com/Xuanwo/go-bufferpool v0.2.0 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-isatty v0.0.19 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+)

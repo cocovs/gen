@@ -1,6 +1,6 @@
 module github.com/cocovs/gen
 
-go 1.22.2
+go 1.22
 
 require (
 	github.com/Xuanwo/gg v0.3.0

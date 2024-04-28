@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 
 	gg "github.com/Xuanwo/gg"
 
@@ -97,7 +98,7 @@ func (c *ProtoConfig) OutSvcFrame(methods map[string][]*rpcMethod) error {
 				AddBody(gg.String("return  nil"))
 		}
 
-		file, err := os.OpenFile(c.OutSvcFolder+rpcServiceName+"_svc.go", func() int {
+		file, err := os.OpenFile(c.OutSvcFolder+strings.ToLower(rpcServiceName)+"_svc.go", func() int {
 			if c.AppendOption {
 				return os.O_APPEND | os.O_CREATE | os.O_WRONLY
 			}
@@ -154,7 +155,7 @@ func (c *ProtoConfig) OutHandlerFrame(methods map[string][]*rpcMethod) error {
 				AddBody(gg.Call(method.Name).WithOwner("h." + rpcServiceName + "Svc").AddParameter("ctx")).
 				AddBody(gg.String("return nil, nil"))
 		}
-		file, err := os.OpenFile(c.OutHandlerFolder+rpcServiceName+"_handler.go", func() int {
+		file, err := os.OpenFile(c.OutHandlerFolder+strings.ToLower(rpcServiceName)+"_handler.go", func() int {
 			if c.AppendOption {
 				return os.O_APPEND | os.O_CREATE | os.O_WRONLY
 			}
